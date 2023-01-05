@@ -42,23 +42,20 @@ cpct (2017-2022)
 ERA5:- download monthly and hourly data
 Notes:  - To convert data from GRIB to netcdf
          e.g. cdo -f nc copy <input grib> <output netcdf>
-        - If era5t data has 2 levels, use 'cdo -b F64 mergetime' to merge files
+        - If era5t data has 2 levels, use 'cdo -b F64 -mergetime -vertsum' to merge files
 
-  - Regrid to 0.5 x 0.5 grid
-      cdo remapbil,./../grid_0.5,txt era5/HH/tp/1979-2021.nc era5/HH/tp/1979-2021_0.5.nc
-      cdo remapbil,./../grid_0.5,txt era5/HH/2mT/1979-2021.nc era5/HH/2mT/1979-2021_0.5.nc
-  - Convert temperature from K to C
-      cdo sub,-273.15 era5/HH/2mT/1979-2021_0.5.nc  era5/HH/2mT/1979-2021_0.5C.nc
   - Separate data into yearly files
-      cdo splityear era5/HH/tp/1979-2021_0.5.nc tp_
-      cdo splityear era5/HH/2mT/1979-2021_0.5C.nc 2mT_
-  - Rename files
-      e.g. for file in 2mT_*.nc; do ${file} ${file/.nc/_0.5C.nc}; done
+    cdo splityear era5/HH/tp/1979-2021.nc tp_
+    cdo splityear era5/HH/2mT/1979-2021.nc 2mT_
+  - Regrid to 0.5 x 0.5 grid
+      cdo remapbil,./../grid_0.5,txt era5/HH/tp/1979.nc era5/HH/tp/tp_1979_0.5.nc
+      cdo remapbil,./../grid_0.5,txt era5/HH/2mT/1979.nc era5/HH/2mT/2mT_1979_0.5.nc
+  - Convert temperature from K to C
+      cdo subc,273.15 era5/HH/2mT/2mT_1979_0.5.nc  era5/HH/2mT/2mT_1979_0.5C.nc
 
 Method:
 ------
-- As mentioned above, climatologies and anomalies were calculated using CDO and all datasets were interpolated onto
-0.5 x 0.5 global grid using the bilinear interpolation method of CDO
+- All datasets were interpolated onto 0.5 x 0.5 global grid using the bilinear interpolation method of CDO
 - ERA5 data is split into separate years
 
 - For precipitation bias correction,
@@ -68,17 +65,12 @@ Method:
   nohup bash ./run_2mT_bc.sh 1979 01 2022 04 &
 
 
-  #- Multiply daily, hourly files with 1000 using CDO
-  #  cdo -daysum -mulc,1000 1979-2021_0.5.nc 1979-2021_ds_mm_0.5.nc
-  #- Calculate nwet in ERA5 using CDO
-  #  cdo monsum -gec,0 1979-2021_dm_mm_0.5.nc 1979-2021_nwetdays_mon.nc
-
-
 Output:
 ------
-pabsmean_1979-202204.nc :
-nwet_1979-202204.nc:
+tabsmean_1979-202211.nc
+pabsmean_1979-202211.nc
+nwet_1979-202204.nc
 
 Bias corrected yearly files in folder 2mT_bc and tp_bc
-  e.g. ./2mT_bc/2mT_bc_1979_0.5.nc
+  e.g. /2mT_bc/2mT_bc_1979_0.5.nc
 
