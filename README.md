@@ -1,6 +1,4 @@
-=======================================
-Berg et al. 2021 bias correction method
-=======================================
+# Berg et al. 2021 bias correction method
 
 Datasets and sources + data cleaning:
 ------------------------------------
